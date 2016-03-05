@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.UI.WebControls.WebParts;
+﻿using System.Web.Mvc;
 using ItAcademy.PropertyCenter.Entities;
 using ItAcademy.PropertyCenter.Services;
 using Microsoft.Practices.Unity;
+using ItAcademy.PropertyCenter.Core;
 
 namespace ItAcademy.PropertyCenter.Controllers
 {
-    public class AgencyController : Controller
+    [Authorize(Roles = "Administrator,Guest")]
+    public class AgencyController : LocalizableController
     {
         [Dependency]
         public IAgencyService AgencyService { get; set; }
 
-        // GET: Agency
+        [OutputCache(CacheProfile = "listProfile")]
         public ActionResult Index()
         {
             var agencies = AgencyService.GetAll();
@@ -37,11 +34,12 @@ namespace ItAcademy.PropertyCenter.Controllers
             return PartialView("_CreateAgency", agency);
         }
 
+        [HttpPost]
         public ActionResult Create(Agency agency)
         {
             if (ModelState.IsValid)
             {
-                AgencyService.Add(announcement);
+                AgencyService.AddAgency(agency);
 
                 return AgencyList();
             }
